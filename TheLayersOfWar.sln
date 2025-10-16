@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36603.0 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheLayersOfWar", "TheLayersOfWar.csproj", "{235BABAE-4AB4-4CBB-A130-71D21E56B24F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{235BABAE-4AB4-4CBB-A130-71D21E56B24F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{235BABAE-4AB4-4CBB-A130-71D21E56B24F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{235BABAE-4AB4-4CBB-A130-71D21E56B24F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{235BABAE-4AB4-4CBB-A130-71D21E56B24F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {637169B9-AAB9-4440-8597-1F36454D27DF}
+	EndGlobalSection
+EndGlobal

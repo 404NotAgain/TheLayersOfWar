@@ -1,0 +1,15 @@
+C:\Users\ChilindrishviliLuisa\source\repos\TheLayersOfWar\bin\Debug\net8.0\TheLayersOfWar.exe
+C:\Users\ChilindrishviliLuisa\source\repos\TheLayersOfWar\bin\Debug\net8.0\TheLayersOfWar.deps.json
+C:\Users\ChilindrishviliLuisa\source\repos\TheLayersOfWar\bin\Debug\net8.0\TheLayersOfWar.runtimeconfig.json
+C:\Users\ChilindrishviliLuisa\source\repos\TheLayersOfWar\bin\Debug\net8.0\TheLayersOfWar.dll
+C:\Users\ChilindrishviliLuisa\source\repos\TheLayersOfWar\bin\Debug\net8.0\TheLayersOfWar.pdb
+C:\Users\ChilindrishviliLuisa\source\repos\TheLayersOfWar\obj\Debug\net8.0\TheLayersOfWar.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ChilindrishviliLuisa\source\repos\TheLayersOfWar\obj\Debug\net8.0\TheLayersOfWar.AssemblyInfoInputs.cache
+C:\Users\ChilindrishviliLuisa\source\repos\TheLayersOfWar\obj\Debug\net8.0\TheLayersOfWar.AssemblyInfo.cs
+C:\Users\ChilindrishviliLuisa\source\repos\TheLayersOfWar\obj\Debug\net8.0\TheLayersOfWar.csproj.CoreCompileInputs.cache
+C:\Users\ChilindrishviliLuisa\source\repos\TheLayersOfWar\obj\Debug\net8.0\TheLayersOfWar.sourcelink.json
+C:\Users\ChilindrishviliLuisa\source\repos\TheLayersOfWar\obj\Debug\net8.0\TheLayersOfWar.dll
+C:\Users\ChilindrishviliLuisa\source\repos\TheLayersOfWar\obj\Debug\net8.0\refint\TheLayersOfWar.dll
+C:\Users\ChilindrishviliLuisa\source\repos\TheLayersOfWar\obj\Debug\net8.0\TheLayersOfWar.pdb
+C:\Users\ChilindrishviliLuisa\source\repos\TheLayersOfWar\obj\Debug\net8.0\TheLayersOfWar.genruntimeconfig.cache
+C:\Users\ChilindrishviliLuisa\source\repos\TheLayersOfWar\obj\Debug\net8.0\ref\TheLayersOfWar.dll
