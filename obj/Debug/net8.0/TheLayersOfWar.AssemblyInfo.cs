@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TheLayersOfWar")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5421c6d88bc1187d60a2f2eb4b17ee03f2fbab2f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+320ffacc1e1239ff536febf89a0fbe21b42a66bc")]
 [assembly: System.Reflection.AssemblyProductAttribute("TheLayersOfWar")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TheLayersOfWar")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
