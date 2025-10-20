@@ -1,8 +1,10 @@
 ﻿namespace TheLayersOfWar
 {
     using System;
-    using System.Threading;
+    using System.Reflection.Emit;
     using System.Text.Json;
+    using System.Threading;
+    using static System.Net.Mime.MediaTypeNames;
 
     class Program
     {
@@ -41,7 +43,9 @@
                     ShowTitleScreen();
                     break;
                 case "4":
-                    Console.WriteLine("Goodbye, brave veggie.");
+                    Console.WriteLine("\n><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><");
+                    Console.WriteLine(" Farewell, brave veggie. May your journey be fruitful until we meet again.");
+                    Console.WriteLine("><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><\n");
                     Environment.Exit(0);
                     break;
                 default:
@@ -70,7 +74,9 @@
                 {
                     Console.WriteLine("Please enter a name that is worthy for a strong princess -letters only, no numbers or symbols!.");
                 }
-                
+
+                Console.Write("\n-----------------------------------------------------------\n");
+                Console.WriteLine("Press any key to continue!");
                 Console.ReadKey() ;
 
             } while (!IsValidName(warriorName));
@@ -91,19 +97,23 @@
                     Console.WriteLine("A wise princess deserves a graceful name — letters only, no numbers or symbols, please!");
                 }
 
+                Console.Write("\n-----------------------------------------------------------\n");
+                Console.WriteLine("Press any key to continue!");
                 Console.ReadKey() ;
 
             } while (!IsValidName(wiseName));
             currentPlayer.WiseName = wiseName;
 
             Console.Clear();
+            Console.WriteLine("\n-----------------------------------------------------------------------------------------------------");
             Console.WriteLine($"\nThe kingdom shall remember their names as: {currentPlayer.WarriorName} and {currentPlayer.WiseName}.");
+            Console.WriteLine("\n-----------------------------------------------------------------------------------------------------\n");
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
         }
         static bool IsValidName(string name)
         {
-            return !string.IsNullOrWhiteSpace(name) && name.All(char.IsLetter); // stellt sicher das im Namen nur buchstaben verwendet werden und nichts leer bleibt
+            return !string.IsNullOrWhiteSpace(name) && name.All(char.IsLetter); 
         }
         static void ShowIntroNarration()
         {
@@ -130,10 +140,10 @@
             "And so your tale begins..."
             };
 
-            foreach (string line in introLines) // jede string line bekommt 1,6 sekunden zeit bevor die nächste zeile erscheint
+            foreach (string line in introLines) // jede string line bekommt 1,2 sekunden zeit bevor die nächste zeile erscheint
             {
                 Console.WriteLine(line);
-                Thread.Sleep(1600);
+                Thread.Sleep(900);
             }
 
             Console.WriteLine("\n\nPress any key to continue...");
@@ -156,7 +166,7 @@
             {
                 "Long before the fall, Layeria was a land of abundance and balance.",
                 "Verdant fields rolled across the hills, each layer of soil rich with history and harmony.",
-                "Villagers of every veggie kind — carrots, beets, even the proud broccoli clans — lived in peace under the onion-sister's rule.",
+                "Villagers of every veggie kind — carrots, beets, even the proud broccoli clans — lived in peace under the onion-sister'srule.",
                 "",
                 $"The twin rulers, led from the heart of the Onion-Domed Castle.",
                 "One, a fierce protector of the borders. The other, a healer of minds and land alike.",
@@ -178,7 +188,7 @@
             foreach (string line in lore)
             {
                 Console.WriteLine(line);
-                Thread.Sleep(80);
+                Thread.Sleep(300);
             }
 
             Console.ResetColor();
@@ -188,27 +198,67 @@
             Console.ResetColor();
             Console.ReadKey();
         }
-        static Enemy GetEnemyForLevel(string world, int level)
-        {
-            if (world == "Finsterwurzelhöhle")
-            {
-                return null!; // keine extra gegner in der endwelt
-
-            }
-            if (level == 3)
-            {
-                // Mini-Boss auf jedem dritten Level
-                return new Mini_Boss("Kern-Keiler");
-            }
-
-            // Normale Gegner
-            return new Enemy("Gurkenreiter", 20, 5);
-        }
         static void StartFinalBossFight()
         {
-            Enemy finalBoss = new Final_Boss();
-            Console.WriteLine("Draconfruit, The destroyer of fields has appeared to bring you, your peely end!");
+            while (true)
+            {
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                Console.WriteLine("Draconfruit, the Destroyer of Fields, rises with a hiss and a thunderclap!");
+                Console.ResetColor();
 
+                Console.WriteLine("His peel crackles with cursed energy. His eyes glow with fermented rage.");
+                Console.WriteLine("You feel the weight of every fallen sprout in your hand... and your heart.");
+                Console.WriteLine("\nThe final battle begins!");
+                Console.WriteLine("\nPress any key to face Draconfruit...");
+                Console.ReadKey();
+
+                Enemy finalBoss = new Final_Boss();
+                FightEnemy(finalBoss);
+
+                if (Program.currentPlayer.Health > 0)
+                {
+                    // Player won
+                    break;
+                }
+
+                Console.Clear();
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("You were defeated by Draconfruit... Your tale could end here.");
+                Console.ResetColor();
+
+                Console.Write("\nWould you like to try the final battle again? (y/n): ");
+                string retry = Console.ReadLine()?.ToLower().Trim() ?? "";
+
+                if (retry != "y")
+                {
+                    Console.WriteLine("\nFarewell, brave veggie. May your journey be fruitful until we meet again.");
+                    Console.WriteLine("Press any key to return to the title screen...");
+                    Console.ReadKey();
+                    ShowTitleScreen();
+                    return;
+                }
+
+                // Reset the player's health when retrying
+                Program.currentPlayer.Health = 25; 
+            }
+            Console.Clear();
+            Console.WriteLine("\nYou’ve won the game!");
+            Console.WriteLine("Reunited, 'The Twinions' can finally take the long awaited vacation at Honey Beach...");
+            Console.WriteLine("");
+            Console.WriteLine("For the first time in many seasons, the sun rises over Layeria.");
+            Console.WriteLine("Among the scorched fields, gentle sprouts begin to grow.");
+            Console.WriteLine("From fields once laid to waste, small radishes now sprout, potatoes greet the sunlight, ");
+            Console.WriteLine("while other crops begin to rise — bringing new hope to the Kingdom of Layeria for a bountiful and blooming future...");
+            Console.WriteLine("The wind still whispers the names of the fallen — but today, it whispers hope as well.");
+            Console.WriteLine("");
+            Console.WriteLine($"{currentPlayer.WarriorName} and {currentPlayer.WiseName} stand side by side.");
+            Console.WriteLine("Not as warrior and wise one, but simply: as sisters.");
+            Console.WriteLine("");
+            Console.WriteLine("Honey Beach awaits. And this time... without weapons.");
+            Console.WriteLine("\nPress any key to return to the main menu.");
+            Console.ReadKey();
+            ShowTitleScreen();
         }
         static void TransitionToWorld(string worldName)
         {
@@ -247,7 +297,8 @@
                        "",
                        "The deeper you go, the less you trust your own footsteps.",
                        $"Voices echo — faint cries can be heared and you make them out to belong to your beloved sister {currentPlayer.WiseName}",
-                       "Your kindeling flame of power ",
+                       "Your kindeling flame of power returns, eager to bring the rotten to justice",
+                       "Suddenly your hear a fearsome roar, followed by sound of despair and decay...",
                        "Draconfruit is close... Too close...",
                     };
                     break;
@@ -264,7 +315,7 @@
             foreach (string line in loreLines) 
             {
                 Console.WriteLine(line);
-                Thread.Sleep(1600);
+                Thread.Sleep(900);
             }
 
             Console.WriteLine("\nPress any key to continue...");
@@ -277,36 +328,50 @@
             Console.Clear();
             Console.WriteLine($"You entered: {worldName}.\n");
 
-            if (worldName == "Cave of whispers")
-            {
-                StartFinalBossFight();
-                Console.WriteLine("\nYou’ve won the game!");
-                Console.WriteLine("Finally reunited 'The Twinions' can finally take a vacation at Honey Beach...");
-                Console.WriteLine("");
-                Console.WriteLine("For the first time in many seasons, the sun rises over Layeria.");
-                Console.WriteLine("Among the scorched fields, gentle sprouts begin to grow.");
-                Console.WriteLine("The wind still whispers the names of the fallen — but today, it whispers hope too.");
-                Console.WriteLine("");
-                Console.WriteLine($"{currentPlayer.WarriorName} and {currentPlayer.WiseName} stand side by side.");
-                Console.WriteLine("Not as warrior and wise one, but simply: as sisters.");
-                Console.WriteLine("");
-                Console.WriteLine("Honey Beach awaits. And this time... without weapons.");
-                Console.WriteLine("\nPress any key to return to the main menu.");
-                Console.ReadKey();
-                ShowTitleScreen();
-                return;
-            }
-
             for (int i = 1; i <= 3; i++)
             {
+                Console.Clear();
+
+                // Mini-boss buildup before level 3
+                if (i == 3)
+                {
+                    Console.WriteLine($"You feel a shift in the air... Something big awaits at {worldName} – Sublevel {i}.");
+                    Console.WriteLine("Prepare yourself for the threat that is awaiting...");
+                    Console.WriteLine("\nPress any key to continue...");
+                    Console.ReadKey();
+                    Console.Clear();
+                }
                 Console.WriteLine($"--- {worldName} – Sublevel {i} ---");
                 Console.WriteLine("\nPress any key to continue...");
                 Console.ReadKey();
 
                 EnterLevel(i, worldName);
+
+                // Flavor text between sublevels 1 and 2 for main worlds
+                if (i == 1)
+                {
+                    if (worldName == "Ruins of Layeria")
+                    {
+                        Console.Clear();
+                        Console.WriteLine("The ruins whisper tales of fallen heroes and forgotten glory...");
+                        Console.WriteLine("You steel yourself to continue deeper into the shadows.");
+                        Console.WriteLine("\nPress any key to press onward...");
+                        Console.ReadKey();
+                    }
+                    else if (worldName == "Bitterroot Forest")
+                    {
+                        Console.Clear();
+                        Console.WriteLine("The forest grows darker and the air thickens with the scent of decay.");
+                        Console.WriteLine("You hear distant rustling — something watches.");
+                        Console.WriteLine("\nPress any key to push forward...");
+                        Console.ReadKey();
+                    }
+                }
             }
+
             // Zur nächsten Welt übergehen
             string nextWorld = GetNextWorld(worldName);
+
             if (!string.IsNullOrEmpty(nextWorld))
             {
                 TransitionToWorld(nextWorld);
@@ -314,16 +379,28 @@
         }
         static void EnterLevel(int levelNumber, string worldName)
         {
-            Enemy enemy = GetEnemyForLevel(worldName, levelNumber);
-            if (enemy == null) return; // prüft das keine extra gegner in der endwelt erscheinen
+            List<Enemy> enemies = EnemyFactory.GetEnemiesForLevel(worldName, levelNumber);
 
             Console.Clear();
             Console.WriteLine($"{worldName} – Sublevel {levelNumber}");
+            Console.WriteLine($"Enemies appear: {string.Join(", ", enemies.Select(e => e.Name))}!");
 
-            Console.WriteLine($"An enemy appears: {enemy.Name}!");
-            Console.WriteLine("(Kampfsystem kommt später)");
+            Console.WriteLine("\nPress any key to begin the battle...");
+            Console.ReadKey();
 
-            Console.WriteLine("\nPress any key to continue...");
+            foreach (var enemy in enemies)
+            {
+                FightEnemy(enemy);
+
+                if (Program.currentPlayer.Health <= 0)
+                {
+                    Console.WriteLine("You have been defeated. Game over.");
+                    Console.ReadKey();
+                    return;
+                }
+            }
+
+            Console.WriteLine("\nAll enemies defeated! Press any key to continue...");
             Console.ReadKey();
         }
         static string GetNextWorld(string current)
@@ -336,6 +413,83 @@
 
             }
         }
+        static void FightEnemy(Enemy enemy)
+        {
+            Player player = Program.currentPlayer;
+
+            while (enemy.Health > 0 && player.Health > 0)
+            {
+                Console.Clear();
+                Console.WriteLine($"Enemy: {enemy.Name} | HP: {enemy.Health}");
+                Console.WriteLine($"You: HP: {player.Health}\n");
+
+                if (player.IsStunned)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.WriteLine("You are stunned and lose your turn!");
+                    Console.ResetColor();
+                    player.IsStunned = false;
+
+                    Thread.Sleep(1500); // automatisch setzt eine runde aus 
+                }
+                else
+                {
+                    Console.WriteLine("[1] Saut\u00E9");
+                    Console.WriteLine("[2] Start crying");
+                    Console.WriteLine("[3] Sprout and scout");
+                    Console.Write("\nChoose your action: ");
+                    string input = Console.ReadLine() ?? "";
+
+                    switch (input)
+                    {
+                        case "1":
+                            Console.WriteLine($"Saut\u00E9! You sear {enemy.Name} for {player.Damage} spicy damage!");
+                            enemy.Health -= player.Damage;
+                            break;
+
+                        case "2":
+                            player.Heal();
+                            break;
+
+                        case "3":
+                            Console.WriteLine("Time to sprout and scout—this onion’s out!");
+                            return; 
+                        default:
+                            Console.WriteLine("Nope! That action's overcooked. Turn lost!");
+                            break;
+                    }
+                    Thread.Sleep(1000);
+                }
+
+                // Enemy's turn if still alive
+                if (enemy.Health > 0)
+                {
+                    enemy.Attack(player);
+                    Thread.Sleep(1000);
+                }
+            }
+
+            // End of fight
+            if (player.Health <= 0)
+            {
+                Console.WriteLine("You were defeated...");
+                // Handle death or retry logic here
+            }
+            else if (enemy.Health <= 0)
+            {
+                Console.WriteLine($"You defeated the {enemy.Name}!");
+                // XP gain, loot, etc.
+                int xpEarned = 5; 
+                Console.WriteLine($"You gained {xpEarned} XP!");
+                player.XPGain(xpEarned);
+
+            }
+
+            Console.WriteLine("\nPress any key to continue...");
+            Console.ReadKey();
+        }
+
+
 
 
     }
