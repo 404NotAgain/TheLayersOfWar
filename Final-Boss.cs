@@ -50,7 +50,7 @@ namespace TheLayersOfWar
             Console.ResetColor();
 
             int totalMiniDamage = numberOfMinis * 2;
-            Console.WriteLine($"Each bites for 2 damage — you take {totalMiniDamage} total damage!");
+            Console.WriteLine($"The little Draconfruits bite you, one by one — you take {totalMiniDamage} damage!");
 
             player.Health -= totalMiniDamage;
         }

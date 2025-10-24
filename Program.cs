@@ -36,7 +36,7 @@
                     ShowIntroNarration();
                     return;
                 case "2":
-                    //ShowLoadMenuAndLoadGames
+                    SaveData.LoadGame();
                     return;
                 case "3":
                     ShowAboutLayeria();
@@ -214,7 +214,7 @@
                 Console.ReadKey();
 
                 Enemy finalBoss = new Final_Boss();
-                FightEnemy(finalBoss);
+                FightEnemy(finalBoss, "Cave of Whispers", 99);
 
                 if (Program.currentPlayer.Health > 0)
                 {
@@ -260,7 +260,7 @@
             Console.ReadKey();
             ShowTitleScreen();
         }
-        static void TransitionToWorld(string worldName)
+        public static void TransitionToWorld(string worldName)
         {
             Console.Clear();
             string[] loreLines; // macht das in jedem level eine kleine story immersion ist, inklusive pausen zwischen zeilen
@@ -376,21 +376,33 @@
             {
                 TransitionToWorld(nextWorld);
             }
+            else
+            { 
+                StartFinalBossFight();
+            }
         }
         static void EnterLevel(int levelNumber, string worldName)
         {
             List<Enemy> enemies = EnemyFactory.GetEnemiesForLevel(worldName, levelNumber);
 
             Console.Clear();
-            Console.WriteLine($"{worldName} – Sublevel {levelNumber}");
+            Console.WriteLine($"DEBUG:{worldName} – Sublevel {levelNumber}");
             Console.WriteLine($"Enemies appear: {string.Join(", ", enemies.Select(e => e.Name))}!");
 
             Console.WriteLine("\nPress any key to begin the battle...");
             Console.ReadKey();
 
+            Console.WriteLine($"DEBUG: {enemies.Count} enemies loaded for {worldName} Level {levelNumber}");
+            foreach (var e in enemies)
+                Console.WriteLine($"DEBUG: Enemy = {e.Name}, HP = {e.Health}");
+            Console.ReadKey();
+
+            Console.WriteLine($"DEBUG: Player HP before fights: {Program.currentPlayer.Health}");
+            Console.ReadKey();
+
             foreach (var enemy in enemies)
             {
-                FightEnemy(enemy);
+                FightEnemy(enemy, worldName, levelNumber);
 
                 if (Program.currentPlayer.Health <= 0)
                 {
@@ -398,6 +410,12 @@
                     Console.ReadKey();
                     return;
                 }
+            }
+
+            // Nach Sieg des Levels automatisch speichern
+            if (Program.currentPlayer.Health > 0)
+            {
+                SaveData.SaveGame(Program.currentPlayer, worldName, levelNumber);
             }
 
             Console.WriteLine("\nAll enemies defeated! Press any key to continue...");
@@ -408,12 +426,12 @@
             switch (current)
             {
                 case "Ruins of Layeria": return "Bitterroot Forest";
-                case "Bitterroot Forest": return "Cave of whispers";
+                case "Bitterroot Forest": return "Cave of Whispers";
                 default: return ""; // automatisiert den übergang von den welten zur nächsten
 
             }
         }
-        static void FightEnemy(Enemy enemy)
+        static void FightEnemy(Enemy enemy, string worldName, int levelNumber)
         {
             Player player = Program.currentPlayer;
 
@@ -453,7 +471,7 @@
 
                         case "3":
                             Console.WriteLine("Time to sprout and scout—this onion’s out!");
-                            return; 
+                            break; 
                         default:
                             Console.WriteLine("Nope! That action's overcooked. Turn lost!");
                             break;
@@ -483,14 +501,69 @@
                 Console.WriteLine($"You gained {xpEarned} XP!");
                 player.XPGain(xpEarned);
 
+                SaveData.SaveGame(currentPlayer, worldName, levelNumber);
+
+                // 🎁 World-based loot and rewards
+                string reward = null;
+                string description = "";
+                int bonusDamage = 0;
+
+                // --- Ruins of Layeria: Starter weapon ---
+                if (worldName == "Ruins of Layeria" && !player.Weapons.Contains("Rusty Dagger"))
+                {
+                    reward = "Rusty Dagger";
+                    description = "A chipped blade, dull but determined — it’s seen better harvests.";
+                    bonusDamage = 2;
+
+                    player.Weapons.Add(reward);
+                    player.EquippedWeapon = reward;
+                    player.Damage += bonusDamage;
+
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine($"\nYou found a weapon: {reward}!");
+                    Console.ResetColor();
+                    Console.WriteLine($"\"{description}\"");
+                    Console.WriteLine($"Automatically equipped! (+{bonusDamage} Damage)");
+                    Thread.Sleep(2000);
+                }
+
+                // --- Bitterroot Forest: Tearblade ---
+                else if (worldName == "Bitterroot Forest" && !player.Weapons.Contains("Tearblade"))
+                {
+                    reward = "Tearblade";
+                    description = "A blade cooled in tears of courage — said to cut through despair itself.";
+                    bonusDamage = 6;
+
+                    player.Weapons.Add(reward);
+                    player.EquippedWeapon = reward;
+                    player.Damage += bonusDamage;
+
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"\nYou obtained the weapon: {reward}!");
+                    Console.ResetColor();
+                    Console.WriteLine($"\"{description}\"");
+                    Console.WriteLine($"Automatically equipped! (+{bonusDamage} Damage)");
+                    Thread.Sleep(2000);
+                }
+
+                // --- Cave of Whispers: Honey Beach Tickets ---
+                else if (worldName == "Cave of Whispers" && !player.Inventory.Contains("Honey Beach Tickets"))
+                {
+                    reward = "Honey Beach Tickets";
+                    description = "Two golden tickets — symbols of peace, and of a promise finally fulfilled.";
+
+                    player.Inventory.Add(reward);
+
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.WriteLine($"\nYou found: {reward}!");
+                    Console.ResetColor();
+                    Console.WriteLine($"\"{description}\"");
+                    Thread.Sleep(2000);
+                }
             }
 
             Console.WriteLine("\nPress any key to continue...");
             Console.ReadKey();
         }
-
-
-
-
     }
 }

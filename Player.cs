@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TheLayersOfWar
 {
-    internal class Player
+    public class Player
     {
         public string WarriorName { get; set; }
         public string WiseName { get; set; }
@@ -20,9 +20,19 @@ namespace TheLayersOfWar
 
         public bool IsStunned { get; set; } = false;
 
+        public List<string> Weapons { get; set; } = new List<string>();
+        public List<string> Inventory { get; set; } = new List<string>();
+        public string EquippedWeapon { get; set; } = "Bare Hands";
 
         public DateTime SaveTime { get; set; }
         public string CurrentWorld { get; set; } = string.Empty;
+
+        public Player() 
+        {
+            MaxHealth = 25;
+            Health = MaxHealth; // ✅ Start with full HP
+            Damage = 5;
+        }
 
         public void Heal() 
         {
@@ -60,7 +70,7 @@ namespace TheLayersOfWar
 
             if (levelsGained > 1)
             {
-                Console.WriteLine($"\nIncredible! You’ve leveled up {levelsGained} times — you’re the *root* of all strength now!");
+                Console.WriteLine($"\nIncredible! You’ve leveled up {levelsGained} times — you’re the root of all strength now!");
             }
             else if (levelsGained == 1)
             {

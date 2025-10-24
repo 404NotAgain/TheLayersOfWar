@@ -25,6 +25,7 @@ namespace TheLayersOfWar
                 hasHealed = true;
                 int healAmount = MaxHealth - Health; // heals fully
                 Health = MaxHealth;
+
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"{Name} retreats into her vines and regrows! She heals {healAmount} HP.");
                 Console.ResetColor();
