@@ -13,14 +13,20 @@ namespace TheLayersOfWar
         public string WarriorName { get; set; }
         public string WiseName { get; set; }
         public string World { get; set; }
+        public int Damage { get; set; }
+        public int MaxHealth { get; set; }
         public int Level { get; set; }
         public int XP { get; set; }
         public int Health { get; set; }
         public DateTime SaveDate { get; set; }
 
+        public List<string> Weapons { get; set; } = new();
+        public List<string> Inventory { get; set; } = new();
+        public string EquippedWeapon { get; set; } = "";
+
         private static readonly string SaveFolder = "Saves";
 
-        // 🧅 Speichern des aktuellen Spielstands
+
         public static void SaveGame(Player player, string world, int level)
         {
             if (!Directory.Exists(SaveFolder))
@@ -34,10 +40,15 @@ namespace TheLayersOfWar
                 Level = level,
                 XP = player.XP,
                 Health = player.Health,
+                MaxHealth = player.MaxHealth,
+                Damage = player.Damage,
+                Weapons = player.Weapons.ToList(),
+                Inventory = player.Inventory.ToList(),
+                EquippedWeapon = player.EquippedWeapon,
                 SaveDate = DateTime.Now
             };
 
-            string fileName = $"{player.WarriorName}_{DateTime.Now:yyyyMMdd_HHmmss}.json";
+            string fileName = $"{player.WarriorName}_{world}_{DateTime.Now:yyyyMMdd_HHmmss}.json";
             string path = Path.Combine(SaveFolder, fileName);
 
             string json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
@@ -50,7 +61,7 @@ namespace TheLayersOfWar
             Console.ReadKey();
         }
 
-        // 🧅 Spielstände anzeigen und auswählen
+
         public static void LoadGame()
         {
             if (!Directory.Exists(SaveFolder))
@@ -60,7 +71,9 @@ namespace TheLayersOfWar
                 return;
             }
 
-            string[] files = Directory.GetFiles(SaveFolder, "*.json");
+            string[] files = Directory.GetFiles(SaveFolder, "*.json")
+            .OrderByDescending(f => File.GetCreationTime(f))
+            .ToArray(); // it orders the save, newest on top
 
             if (files.Length == 0)
             {
@@ -71,7 +84,7 @@ namespace TheLayersOfWar
 
             Console.Clear();
             Console.WriteLine("><><><><><><><><><><><><><><><><><><><><><");
-            Console.WriteLine("            🧅 LOAD GAME 🧅");
+            Console.WriteLine("              LOAD GAME  ");
             Console.WriteLine("><><><><><><><><><><><><><><><><><><><><><\n");
 
             for (int i = 0; i < files.Length; i++)
@@ -81,33 +94,99 @@ namespace TheLayersOfWar
                 Console.WriteLine($"[{i + 1}] {save.WarriorName} & {save.WiseName} | {save.World} Lv.{save.Level} | XP:{save.XP} | {save.SaveDate}");
             }
 
-            Console.Write("\nSelect a save number to load: ");
+            Console.WriteLine("\n[0] Delete a save file");
+            Console.WriteLine("[1] Load a save file");
+            Console.WriteLine("[2] Return to title screen");
+            Console.Write("Select an option: ");
             string input = Console.ReadLine() ?? "";
 
-            if (!int.TryParse(input, out int choice) || choice < 1 || choice > files.Length)
+            if (input == "0")
             {
-                Console.WriteLine("Invalid choice. Returning to menu...");
+                Console.Write("Enter the number of the save you want to delete: ");
+                string delInput = Console.ReadLine() ?? "";
+
+                if (int.TryParse(delInput, out int delChoice) && delChoice >= 1 && delChoice <= files.Length)
+                {
+                    Console.Write($"Are you sure you want to delete this save? (y/n): ");
+                    string confirm = Console.ReadLine()?.Trim().ToLower() ?? "n";
+
+                    if (confirm == "y")
+                    {
+                        File.Delete(files[delChoice - 1]);
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("\nSave deleted successfully!");
+                        Console.ResetColor();
+                    }
+                    else
+                    {
+                        Console.WriteLine("Deletion cancelled.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid choice.");
+                }
+
+                Console.WriteLine("\nReturning to title screen...");
+                Thread.Sleep(1000);
+                Program.ShowTitleScreen(); // returns to main menu
                 Console.ReadKey();
                 return;
             }
 
-            string selectedFile = files[choice - 1];
-            string selectedJson = File.ReadAllText(selectedFile);
-            SaveData loadedData = JsonSerializer.Deserialize<SaveData>(selectedJson)!;
+            else if (input == "1")
+            {
+                int choice = -1;
+                while (true)
+                {
+                    Console.Write("\nSelect a save number to load: ");
+                    string loadinput = Console.ReadLine() ?? "";
 
-            ApplySave(loadedData);
+                    if (int.TryParse(loadinput, out choice) && choice >= 1 && choice <= files.Length)
+                        break; // valid choice, continue
+
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Invalid input, try again.");
+                    Console.ResetColor();
+                }
+
+                string selectedFile = files[choice - 1];
+                string selectedJson = File.ReadAllText(selectedFile);
+                SaveData loadedData = JsonSerializer.Deserialize<SaveData>(selectedJson)!;
+
+                ApplySave(loadedData);
+                return;
+            }
+
+            // 🔙 Return to title screen
+            else if (input == "2")
+            {
+                Console.WriteLine("\nReturning to the title screen...");
+                Thread.Sleep(1000);
+                Program.ShowTitleScreen();
+                return;
+            }
         }
 
-        // 🧅 Anwenden des geladenen Spielstands
+
         private static void ApplySave(SaveData save)
         {
-            Program.currentPlayer = new Player
-            {
-                WarriorName = save.WarriorName,
-                WiseName = save.WiseName,
-                XP = save.XP,
-                Health = save.Health
-            };
+            if (Program.currentPlayer == null)
+                Program.currentPlayer = new Player();
+
+            var p = Program.currentPlayer;
+
+            p.WarriorName = save.WarriorName;
+            p.WiseName = save.WiseName;
+            p.XP = save.XP;
+            p.Health = save.Health;
+            p.MaxHealth = save.MaxHealth;
+            p.Damage = save.Damage;
+            p.Weapons = save.Weapons ?? new List<string>();
+            p.Inventory = save.Inventory ?? new List<string>();
+            p.EquippedWeapon = save.EquippedWeapon ?? "Bare Hands";
+            p.CurrentWorld = save.World;
+            p.Level = save.Level;
 
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Cyan;

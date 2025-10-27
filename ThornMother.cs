@@ -14,8 +14,8 @@ namespace TheLayersOfWar
 
         public ThornMother() : base("Thorn Mother")
         {
-            Health = 45;
-            Damage = 10;
+            Health = 65;
+            Damage = 15;
         }
 
         public override void Attack(Player player)

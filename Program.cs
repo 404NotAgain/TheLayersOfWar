@@ -9,13 +9,14 @@
     class Program
     {
         public static Player currentPlayer = new Player();
+        public static bool shouldAutoSave = false; // 🧅 Add this line
 
         static void Main()
         {
             ShowTitleScreen();
         }
 
-        static void ShowTitleScreen()
+        public static void ShowTitleScreen()
         {
             Console.Clear();
             Console.WriteLine("><><><><><><><><><><><><><><><><><><><><><");
@@ -65,7 +66,7 @@
             string warriorName = "";
             do
             {
-                Console.Clear() ;
+                Console.Clear();
                 Console.Write("  Enter the name of the strong, fearless princess: ");
                 Console.Write("\n-----------------------------------------------------------\n");
                 warriorName = Console.ReadLine()?.Trim() ?? "";
@@ -77,7 +78,7 @@
 
                 Console.Write("\n-----------------------------------------------------------\n");
                 Console.WriteLine("Press any key to continue!");
-                Console.ReadKey() ;
+                Console.ReadKey();
 
             } while (!IsValidName(warriorName));
             currentPlayer.WarriorName = warriorName;
@@ -87,7 +88,7 @@
             string wiseName = "";
             do
             {
-                Console.Clear() ;
+                Console.Clear();
                 Console.Write("  Enter the name of the wise, gentle princess: ");
                 Console.Write("\n-----------------------------------------------------------\n");
                 wiseName = Console.ReadLine()?.Trim() ?? "";
@@ -99,7 +100,7 @@
 
                 Console.Write("\n-----------------------------------------------------------\n");
                 Console.WriteLine("Press any key to continue!");
-                Console.ReadKey() ;
+                Console.ReadKey();
 
             } while (!IsValidName(wiseName));
             currentPlayer.WiseName = wiseName;
@@ -113,7 +114,7 @@
         }
         static bool IsValidName(string name)
         {
-            return !string.IsNullOrWhiteSpace(name) && name.All(char.IsLetter); 
+            return !string.IsNullOrWhiteSpace(name) && name.All(char.IsLetter);
         }
         static void ShowIntroNarration()
         {
@@ -151,10 +152,7 @@
 
             TransitionToWorld("Ruins of Layeria");
         }
-        static void ShowLoadMenuAndLoadGames()
-        {
-
-        }
+        //static void ShowLoadMenuAndLoadGames, not needed because i implemented it already on another spot
         static void ShowAboutLayeria()
         {
             Console.Clear();
@@ -240,7 +238,7 @@
                 }
 
                 // Reset the player's health when retrying
-                Program.currentPlayer.Health = 25; 
+                Program.currentPlayer.Health = Program.currentPlayer.MaxHealth;
             }
             Console.Clear();
             Console.WriteLine("\nYou’ve won the game!");
@@ -257,7 +255,16 @@
             Console.WriteLine("");
             Console.WriteLine("Honey Beach awaits. And this time... without weapons.");
             Console.WriteLine("\nPress any key to return to the main menu.");
+
+            SaveData.SaveGame(Program.currentPlayer, "Cave of Whispers", 99);
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.WriteLine("\nYour legendary victory has been recorded in the annals of Layeria!");
+            Console.ResetColor();
+            Thread.Sleep(2000);
+
+            Console.WriteLine("\nPress any key to return to the main menu.");
             Console.ReadKey();
+
             ShowTitleScreen();
         }
         public static void TransitionToWorld(string worldName)
@@ -312,7 +319,7 @@
                     break;
             }
 
-            foreach (string line in loreLines) 
+            foreach (string line in loreLines)
             {
                 Console.WriteLine(line);
                 Thread.Sleep(900);
@@ -325,6 +332,13 @@
         }
         static void EnterWorld(string worldName)
         {
+
+            if (worldName == "Cave of Whispers")
+            {
+                StartFinalBossFight();
+                return;
+            }
+
             Console.Clear();
             Console.WriteLine($"You entered: {worldName}.\n");
 
@@ -369,6 +383,18 @@
                 }
             }
 
+            // ✅ >>> INSERT THIS BLOCK RIGHT HERE <<<
+            if (Program.shouldAutoSave)
+            {
+                SaveData.SaveGame(Program.currentPlayer, worldName, 3);
+                Program.shouldAutoSave = false; // reset flag
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("\nProgress has been saved after defeating the miniboss!");
+                Console.ResetColor();
+                Thread.Sleep(1500);
+            }
+            // ✅ <<< END INSERTED BLOCK >>>
+
             // Zur nächsten Welt übergehen
             string nextWorld = GetNextWorld(worldName);
 
@@ -377,7 +403,7 @@
                 TransitionToWorld(nextWorld);
             }
             else
-            { 
+            {
                 StartFinalBossFight();
             }
         }
@@ -386,19 +412,19 @@
             List<Enemy> enemies = EnemyFactory.GetEnemiesForLevel(worldName, levelNumber);
 
             Console.Clear();
-            Console.WriteLine($"DEBUG:{worldName} – Sublevel {levelNumber}");
+            Console.WriteLine($"{worldName} – Sublevel {levelNumber}");
             Console.WriteLine($"Enemies appear: {string.Join(", ", enemies.Select(e => e.Name))}!");
 
             Console.WriteLine("\nPress any key to begin the battle...");
             Console.ReadKey();
 
-            Console.WriteLine($"DEBUG: {enemies.Count} enemies loaded for {worldName} Level {levelNumber}");
-            foreach (var e in enemies)
-                Console.WriteLine($"DEBUG: Enemy = {e.Name}, HP = {e.Health}");
-            Console.ReadKey();
+            //Console.WriteLine($"DEBUG: {enemies.Count} enemies loaded for {worldName} Level {levelNumber}");
+            //foreach (var e in enemies)
+            //Console.WriteLine($"DEBUG: Enemy = {e.Name}, HP = {e.Health}");
+            //Console.ReadKey();
 
-            Console.WriteLine($"DEBUG: Player HP before fights: {Program.currentPlayer.Health}");
-            Console.ReadKey();
+            //Console.WriteLine($"DEBUG: Player HP before fights: {Program.currentPlayer.Health}");
+            //Console.ReadKey();
 
             foreach (var enemy in enemies)
             {
@@ -412,10 +438,15 @@
                 }
             }
 
-            // Nach Sieg des Levels automatisch speichern
-            if (Program.currentPlayer.Health > 0)
+            // Nach Sieg jeden Bosskampfes automatisch speichern
+            if (Program.currentPlayer.Health > 0 && levelNumber == 3)
             {
-                SaveData.SaveGame(Program.currentPlayer, worldName, levelNumber);
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("\nMini-boss defeated! Auto-saving progress...");
+                Console.ResetColor();
+
+                Program.shouldAutoSave = true; // mark that we should save
+                Thread.Sleep(1500);
             }
 
             Console.WriteLine("\nAll enemies defeated! Press any key to continue...");
@@ -454,7 +485,8 @@
                 {
                     Console.WriteLine("[1] Saut\u00E9");
                     Console.WriteLine("[2] Start crying");
-                    Console.WriteLine("[3] Sprout and scout");
+                    Console.WriteLine("[3] Inventory");
+                    Console.WriteLine("[4] Sprout and scout");
                     Console.Write("\nChoose your action: ");
                     string input = Console.ReadLine() ?? "";
 
@@ -467,23 +499,43 @@
 
                         case "2":
                             player.Heal();
-                            break;
+                            Thread.Sleep(1500);
+                            continue; // ✅skips enemy attack this round
 
                         case "3":
-                            Console.WriteLine("Time to sprout and scout—this onion’s out!");
-                            break; 
+                            ShowInventory(player);
+                            continue; // return to battle 
+
+                        case "4":
+                            Console.ForegroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("\nTime to sprout and scout—this onion’s out!");
+                            Console.ResetColor();
+                            Thread.Sleep(1000);
+
+                            // Save progress before leaving
+                            SaveData.SaveGame(Program.currentPlayer, worldName, levelNumber);
+
+                            Console.WriteLine("\nYour progress has been saved.");
+                            Thread.Sleep(1500);
+
+                            Console.WriteLine("\nRetreating to safety...");
+                            Thread.Sleep(1500);
+
+                            Program.ShowTitleScreen(); // Return to main menu safely
+                            return; // Stop the fight loop completely
+
                         default:
                             Console.WriteLine("Nope! That action's overcooked. Turn lost!");
                             break;
                     }
-                    Thread.Sleep(1000);
+                    Thread.Sleep(1700);
                 }
 
                 // Enemy's turn if still alive
                 if (enemy.Health > 0)
                 {
                     enemy.Attack(player);
-                    Thread.Sleep(1000);
+                    Thread.Sleep(1700);
                 }
             }
 
@@ -491,79 +543,179 @@
             if (player.Health <= 0)
             {
                 Console.WriteLine("You were defeated...");
+                Console.WriteLine("Game Over");
+
                 // Handle death or retry logic here
+                Thread.Sleep(1200);
+                Console.WriteLine("\nWhat would you like to do?");
+                Console.WriteLine("[1] Retry the fight");
+                Console.WriteLine("[2] Return to the title screen");
+                Console.Write("\nChoose an option: ");
+
+                string choice;
+                do
+                {
+                    Console.Write("\nChoose an option (1 or 2): ");
+                    choice = Console.ReadLine()?.Trim();
+                } while (choice != "1" && choice != "2");
+
+                if (choice == "1")
+                {
+                    Console.Clear();
+                    Console.WriteLine("You steady your roots and prepare to face the foe once again...");
+                    Thread.Sleep(1700);
+
+                    // Reset player health for retry
+                    player.Health = player.MaxHealth;
+
+                    // 🔁 Create a fresh copy of the same enemy
+                    Enemy newEnemy = EnemyFactory.Create(enemy.Name);
+
+                    // Restart the same fight
+                    FightEnemy(enemy, worldName, levelNumber);
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("Returning to the main menu...");
+                    Thread.Sleep(1500);
+                    ShowTitleScreen();
+                }
+
+                return;
             }
             else if (enemy.Health <= 0)
             {
                 Console.WriteLine($"You defeated the {enemy.Name}!");
                 // XP gain, loot, etc.
-                int xpEarned = 5; 
+                int xpEarned = 5;
                 Console.WriteLine($"You gained {xpEarned} XP!");
                 player.XPGain(xpEarned);
 
-                SaveData.SaveGame(currentPlayer, worldName, levelNumber);
+                if (levelNumber == 3 && player.Health > 0)
+                {     //World-based loot 
+                    string reward = null;
+                    string description = "";
+                    int bonusDamage = 0;
 
-                // 🎁 World-based loot and rewards
-                string reward = null;
-                string description = "";
-                int bonusDamage = 0;
+                    // --- Ruins of Layeria: Starter weapon ---
+                    if (worldName == "Ruins of Layeria" && !player.Weapons.Contains("Rusty Dagger"))
+                    {
+                        reward = "Rusty Dagger";
+                        description = "A chipped blade, dull but determined — it’s seen better harvests.";
+                        bonusDamage = 2;
 
-                // --- Ruins of Layeria: Starter weapon ---
-                if (worldName == "Ruins of Layeria" && !player.Weapons.Contains("Rusty Dagger"))
-                {
-                    reward = "Rusty Dagger";
-                    description = "A chipped blade, dull but determined — it’s seen better harvests.";
-                    bonusDamage = 2;
+                        player.Weapons.Add(reward);
+                        player.EquippedWeapon = reward;
+                        player.Damage += bonusDamage;
 
-                    player.Weapons.Add(reward);
-                    player.EquippedWeapon = reward;
-                    player.Damage += bonusDamage;
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        Console.WriteLine($"\nYou found a weapon: {reward}!");
+                        Console.ResetColor();
+                        Console.WriteLine($"\"{description}\"");
+                        Console.WriteLine($"Automatically equipped! (+{bonusDamage} Damage)");
+                        Thread.Sleep(2000);
+                    }
 
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.WriteLine($"\nYou found a weapon: {reward}!");
-                    Console.ResetColor();
-                    Console.WriteLine($"\"{description}\"");
-                    Console.WriteLine($"Automatically equipped! (+{bonusDamage} Damage)");
-                    Thread.Sleep(2000);
+                    // --- Bitterroot Forest: Tearblade ---
+                    else if (worldName == "Bitterroot Forest" && !player.Weapons.Contains("Tearblade"))
+                    {
+                        reward = "Tearblade";
+                        description = "A blade cooled in tears of courage — said to cut through despair itself.";
+                        bonusDamage = 5;
+
+                        player.Weapons.Add(reward);
+                        player.EquippedWeapon = reward;
+                        player.Damage += bonusDamage;
+
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine($"\nYou obtained the weapon: {reward}!");
+                        Console.ResetColor();
+                        Console.WriteLine($"\"{description}\"");
+                        Console.WriteLine($"Automatically equipped! (+{bonusDamage} Damage)");
+                        Thread.Sleep(2000);
+                    }
+
+                    // --- Cave of Whispers: Honey Beach Tickets ---
+                    else if (worldName == "Cave of Whispers" && !player.Inventory.Contains("Honey Beach Tickets"))
+                    {
+                        reward = "Honey Beach Tickets";
+                        description = "Two golden tickets — symbols of peace, and of a promise finally fulfilled.";
+
+                        player.Inventory.Add(reward);
+
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine($"\nYou found: {reward}!");
+                        Console.ResetColor();
+                        Console.WriteLine($"\"{description}\"");
+                        Thread.Sleep(2000);
+                    }
                 }
 
-                // --- Bitterroot Forest: Tearblade ---
-                else if (worldName == "Bitterroot Forest" && !player.Weapons.Contains("Tearblade"))
+                Console.WriteLine("\nPress any key to continue...");
+                Console.ReadKey();
+            }
+        }
+        static void ShowInventory(Player player)
+        {
+            Console.Clear();
+            Console.WriteLine("=== INVENTORY ===\n");
+
+            // 🪓 Weapons
+            if (player.Weapons.Count > 0)
+            {
+                Console.WriteLine("Weapons:");
+                foreach (var weapon in player.Weapons)
                 {
-                    reward = "Tearblade";
-                    description = "A blade cooled in tears of courage — said to cut through despair itself.";
-                    bonusDamage = 6;
-
-                    player.Weapons.Add(reward);
-                    player.EquippedWeapon = reward;
-                    player.Damage += bonusDamage;
-
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"\nYou obtained the weapon: {reward}!");
-                    Console.ResetColor();
-                    Console.WriteLine($"\"{description}\"");
-                    Console.WriteLine($"Automatically equipped! (+{bonusDamage} Damage)");
-                    Thread.Sleep(2000);
+                    string equipped = weapon == player.EquippedWeapon ? " (Equipped)" : "";
+                    Console.WriteLine($" - {weapon}{equipped}");
                 }
+            }
+            else
+            {
+                Console.WriteLine("You have no weapons.");
+            }
 
-                // --- Cave of Whispers: Honey Beach Tickets ---
-                else if (worldName == "Cave of Whispers" && !player.Inventory.Contains("Honey Beach Tickets"))
+            // 🎒 Items
+            Console.WriteLine("\nItems:");
+            if (player.Inventory.Count > 0)
+            {
+                foreach (var item in player.Inventory)
+                    Console.WriteLine($" - {item}");
+            }
+            else
+            {
+                Console.WriteLine("You have no items.");
+            }
+
+            // ⚙️ Options
+            Console.WriteLine("\n[1] Equip weapon");
+            Console.WriteLine("[2] Exit inventory");
+            Console.Write("\nChoose an option: ");
+
+            string choice = Console.ReadLine()?.Trim();
+            if (choice == "1")
+            {
+                Console.Write("\nEnter the weapon name to equip: ");
+                string weaponName = Console.ReadLine()?.Trim();
+
+                if (player.Weapons.Contains(weaponName))
                 {
-                    reward = "Honey Beach Tickets";
-                    description = "Two golden tickets — symbols of peace, and of a promise finally fulfilled.";
-
-                    player.Inventory.Add(reward);
-
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine($"\nYou found: {reward}!");
+                    player.EquippedWeapon = weaponName;
+                    Console.WriteLine($"{weaponName} equipped!");
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("You don’t have that weapon.");
                     Console.ResetColor();
-                    Console.WriteLine($"\"{description}\"");
-                    Thread.Sleep(2000);
                 }
             }
 
-            Console.WriteLine("\nPress any key to continue...");
+            Console.WriteLine("\nPress any key to return to battle...");
             Console.ReadKey();
+            Console.Clear();
         }
+
     }
 }

@@ -1,0 +1,16 @@
+{
+  "WarriorName": "bubs",
+  "WiseName": "babs",
+  "World": "Ruins of Layeria",
+  "Damage": 13,
+  "MaxHealth": 37,
+  "Level": 3,
+  "XP": 0,
+  "Health": 37,
+  "SaveDate": "2025-10-27T15:24:55.041008+01:00",
+  "Weapons": [
+    "Rusty Dagger"
+  ],
+  "Inventory": [],
+  "EquippedWeapon": "Rusty Dagger"
+}

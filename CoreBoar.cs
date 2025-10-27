@@ -12,8 +12,8 @@ namespace TheLayersOfWar
         private static Random rng = new Random();
         public CoreBoar() : base("Core-Boar")
         {
-            Health = 40;
-            Damage = 9;
+            Health = 45;
+            Damage = 7;
         }
 
         public override void Attack(Player player)

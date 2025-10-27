@@ -1,0 +1,16 @@
+{
+  "WarriorName": "bubs",
+  "WiseName": "babs",
+  "World": "Bitterroot Forest",
+  "Damage": 15,
+  "MaxHealth": 41,
+  "Level": 3,
+  "XP": 5,
+  "Health": 19,
+  "SaveDate": "2025-10-27T15:27:54.3469576+01:00",
+  "Weapons": [
+    "Rusty Dagger"
+  ],
+  "Inventory": [],
+  "EquippedWeapon": "Rusty Dagger"
+}

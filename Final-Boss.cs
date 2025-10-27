@@ -11,7 +11,7 @@ namespace TheLayersOfWar
         private static Random rng = new Random();
         private int turnCounter = 0;
 
-        public Final_Boss() : base("Draconfruit, the Decayed Tyrant", 125, 15)
+        public Final_Boss() : base("Draconfruit, the Decayed Tyrant", 125, 16)
         {
 
         }
