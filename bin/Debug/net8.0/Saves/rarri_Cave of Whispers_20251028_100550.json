@@ -1,0 +1,20 @@
+{
+  "WarriorName": "rarri",
+  "WiseName": "rurri",
+  "World": "Cave of Whispers",
+  "Damage": 18,
+  "MaxHealth": 37,
+  "CurrentSublevel": 0,
+  "PlayerLevel": 7,
+  "XP": 5,
+  "Health": 17,
+  "SaveDate": "2025-10-28T10:05:50.1000945+01:00",
+  "Weapons": [
+    "Rusty Dagger",
+    "Tearblade"
+  ],
+  "Inventory": [
+    "Tickets to Honey Beach"
+  ],
+  "EquippedWeapon": "Tearblade"
+}

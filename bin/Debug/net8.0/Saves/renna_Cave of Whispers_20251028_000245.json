@@ -1,0 +1,20 @@
+{
+  "WarriorName": "renna",
+  "WiseName": "rienna",
+  "World": "Cave of Whispers",
+  "Damage": 20,
+  "MaxHealth": 41,
+  "CurrentSublevel": 0,
+  "PlayerLevel": 9,
+  "XP": 0,
+  "Health": 41,
+  "SaveDate": "2025-10-28T00:02:45.199189+01:00",
+  "Weapons": [
+    "Rusty Dagger",
+    "Tearblade"
+  ],
+  "Inventory": [
+    "Tickets to Honey Beach"
+  ],
+  "EquippedWeapon": "Tearblade"
+}

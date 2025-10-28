@@ -17,6 +17,7 @@ namespace TheLayersOfWar
 
         public int XP { get; set; } = 0;
         public int Level { get; set; } = 1;
+        public int CurrentSublevel { get; set; } = 1;
 
         public bool IsStunned { get; set; } = false;
 

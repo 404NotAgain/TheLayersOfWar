@@ -1,0 +1,18 @@
+{
+  "WarriorName": "renna",
+  "WiseName": "rienna",
+  "World": "Cave of Whispers",
+  "Damage": 19,
+  "MaxHealth": 39,
+  "CurrentSublevel": 0,
+  "PlayerLevel": 8,
+  "XP": 5,
+  "Health": 19,
+  "SaveDate": "2025-10-27T23:48:38.3081631+01:00",
+  "Weapons": [
+    "Rusty Dagger",
+    "Tearblade"
+  ],
+  "Inventory": [],
+  "EquippedWeapon": "Tearblade"
+}

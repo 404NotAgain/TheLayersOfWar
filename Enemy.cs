@@ -15,9 +15,15 @@ namespace TheLayersOfWar
 
         public Enemy(string name, int health, int damage) 
         {
-            Name = name;    
-            Health = health;
+            Name = name;
+            MaxHealth = health;   // MaxHealth korrekt setzen
+            Health = MaxHealth;   // Health immer auf Startwert setzen
             Damage = damage;
+        }
+
+        public void ResetHealth()
+        {
+            Health = MaxHealth;
         }
 
         public virtual void Attack(Player player) 

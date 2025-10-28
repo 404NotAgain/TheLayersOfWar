@@ -15,7 +15,8 @@ namespace TheLayersOfWar
         public string World { get; set; }
         public int Damage { get; set; }
         public int MaxHealth { get; set; }
-        public int Level { get; set; }
+        public int CurrentSublevel { get; set; }
+        public int PlayerLevel { get; set; }
         public int XP { get; set; }
         public int Health { get; set; }
         public DateTime SaveDate { get; set; }
@@ -24,10 +25,11 @@ namespace TheLayersOfWar
         public List<string> Inventory { get; set; } = new();
         public string EquippedWeapon { get; set; } = "";
 
+
         private static readonly string SaveFolder = "Saves";
 
 
-        public static void SaveGame(Player player, string world, int level)
+        public static void SaveGame(Player player, string world)
         {
             if (!Directory.Exists(SaveFolder))
                 Directory.CreateDirectory(SaveFolder);
@@ -37,10 +39,11 @@ namespace TheLayersOfWar
                 WarriorName = player.WarriorName,
                 WiseName = player.WiseName,
                 World = world,
-                Level = level,
+                CurrentSublevel = player.CurrentSublevel, 
                 XP = player.XP,
                 Health = player.Health,
-                MaxHealth = player.MaxHealth,
+                MaxHealth = player.MaxHealth,  
+                PlayerLevel = player.Level,      
                 Damage = player.Damage,
                 Weapons = player.Weapons.ToList(),
                 Inventory = player.Inventory.ToList(),
@@ -91,7 +94,7 @@ namespace TheLayersOfWar
             {
                 string json = File.ReadAllText(files[i]);
                 SaveData save = JsonSerializer.Deserialize<SaveData>(json)!;
-                Console.WriteLine($"[{i + 1}] {save.WarriorName} & {save.WiseName} | {save.World} Lv.{save.Level} | XP:{save.XP} | {save.SaveDate}");
+                Console.WriteLine($"[{i + 1}] {save.WarriorName} & {save.WiseName} | {save.World} | Player Lv.{save.PlayerLevel} | {save.SaveDate}");
             }
 
             Console.WriteLine("\n[0] Delete a save file");
@@ -186,13 +189,17 @@ namespace TheLayersOfWar
             p.Inventory = save.Inventory ?? new List<string>();
             p.EquippedWeapon = save.EquippedWeapon ?? "Bare Hands";
             p.CurrentWorld = save.World;
-            p.Level = save.Level;
+            p.Level = save.PlayerLevel;   // Use player’s own level
+            p.CurrentSublevel = save.CurrentSublevel;
 
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"Loaded save from {save.SaveDate}!");
             Console.ResetColor();
-            Console.WriteLine($"World: {save.World} | Level: {save.Level} | XP: {save.XP}");
+
+            // Show clear resume info
+            Console.WriteLine($"World: {save.World} – Sublevel {save.CurrentSublevel}");
+            Console.WriteLine($"Player Level: {save.PlayerLevel}");
             Console.WriteLine("\nPress any key to continue your journey...");
             Console.ReadKey();
 

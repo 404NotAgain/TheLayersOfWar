@@ -1,6 +1,7 @@
 ﻿namespace TheLayersOfWar
 {
     using System;
+    using System.Media;
     using System.Reflection.Emit;
     using System.Text.Json;
     using System.Threading;
@@ -9,7 +10,7 @@
     class Program
     {
         public static Player currentPlayer = new Player();
-        public static bool shouldAutoSave = false; // 🧅 Add this line
+        public static bool shouldAutoSave = false; // Add this line
 
         static void Main()
         {
@@ -18,6 +19,9 @@
 
         public static void ShowTitleScreen()
         {
+            SoundPlayer player = new SoundPlayer("TitleScreenMusic.wav");
+            player.PlayLooping();
+
             Console.Clear();
             Console.WriteLine("><><><><><><><><><><><><><><><><><><><><><");
             Console.WriteLine("             The Layers of War     ");
@@ -33,10 +37,12 @@
             switch (input)
             {
                 case "1":
+                    player.Stop();
                     GetTwinNames();
                     ShowIntroNarration();
                     return;
                 case "2":
+                    player.Stop();
                     SaveData.LoadGame();
                     return;
                 case "3":
@@ -44,6 +50,7 @@
                     ShowTitleScreen();
                     break;
                 case "4":
+                    player.Stop();
                     Console.WriteLine("\n><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><");
                     Console.WriteLine(" Farewell, brave veggie. May your journey be fruitful until we meet again.");
                     Console.WriteLine("><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><\n");
@@ -121,7 +128,8 @@
             Console.Clear();
             string[] introLines = new string[]
             {
-            "Darkness hung over Layeria like a storm that had forgotten how to pass.",
+            "><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><",
+            "\n\nDarkness hung over Layeria like a storm that had forgotten how to pass.",
             "",
             $"Once, the land was peaceful. Twin sisters — the strong {currentPlayer.WarriorName} and the wise {currentPlayer.WiseName} — ruled from the onion-domed castle.",
             "Their people called them the Twinions — a joke at first, but a legend in time.",
@@ -138,7 +146,8 @@
             "",
             "\"THEY TOOK MY TWINION!\"",
             "",
-            "And so your tale begins..."
+            "And so your tale begins...\n\n",
+            "><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><",
             };
 
             foreach (string line in introLines) // jede string line bekommt 1,2 sekunden zeit bevor die nächste zeile erscheint
@@ -156,7 +165,7 @@
         static void ShowAboutLayeria()
         {
             Console.Clear();
-            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine(" ABOUT LAYERIA \n");
             Console.WriteLine("><><><><><><><><\n");
 
@@ -198,11 +207,15 @@
         }
         static void StartFinalBossFight()
         {
+            Enemy finalBoss;
+
             while (true)
             {
+                SoundPlayer sp2 = new SoundPlayer("DraconfruitRises.wav");
+                sp2.Play();
                 Console.Clear();
                 Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                Console.WriteLine("Draconfruit, the Destroyer of Fields, rises with a hiss and a thunderclap!");
+                Console.WriteLine("Draconfruit-the Destroyer of Fields, rises with a deafening growl filled with hatred");
                 Console.ResetColor();
 
                 Console.WriteLine("His peel crackles with cursed energy. His eyes glow with fermented rage.");
@@ -211,24 +224,60 @@
                 Console.WriteLine("\nPress any key to face Draconfruit...");
                 Console.ReadKey();
 
-                Enemy finalBoss = new Final_Boss();
+                finalBoss = new Final_Boss();
+                // Debug Check
+                //Console.WriteLine($"DEBUG: {finalBoss.Name} - HP: {finalBoss.Health}/{finalBoss.MaxHealth}, DMG: {finalBoss.Damage}");
+                //Console.WriteLine($"DEBUG: Boss type = {finalBoss.GetType().FullName}");
+                //Console.WriteLine($"DEBUG: Boss hash = {finalBoss.GetHashCode()}"); // optional but useful
+                //Console.ReadKey();
+
+                finalBoss.ResetHealth();
+
                 FightEnemy(finalBoss, "Cave of Whispers", 99);
 
-                if (Program.currentPlayer.Health > 0)
+                if (Program.currentPlayer.Health > 0 && finalBoss.Health <= 0)
                 {
-                    // Player won
+                    // 🏆 Player won – give Honey Beach Tickets
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("\nAs the mighty Draconfruit bursts into pulp, two shiny golden tickets flutter to the ground...");
+                    Console.ResetColor();
+                    Thread.Sleep(3000);
+
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.WriteLine("You obtained: 'Tickets to Honey Beach'!");
+                    Console.ResetColor();
+
+                    if (!Program.currentPlayer.Inventory.Contains("Tickets to Honey Beach"))
+                    {
+                        Program.currentPlayer.Inventory.Add("Tickets to Honey Beach");
+                    }
+
+                    Console.WriteLine("\nYou tuck them safely into your satchel — maybe a vacation awaits after all this madness...");
+                    Thread.Sleep(3000);
                     break;
                 }
 
+                // Player lost
                 Console.Clear();
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("You were defeated by Draconfruit... Your tale could end here.");
+                Console.WriteLine("You were defeated by Draconfruit... Your tale could end here...");
                 Console.ResetColor();
 
                 Console.Write("\nWould you like to try the final battle again? (y/n): ");
                 string retry = Console.ReadLine()?.ToLower().Trim() ?? "";
 
-                if (retry != "y")
+                if (retry == "y")
+                {
+                    // Reset player health for retry
+                    Program.currentPlayer.Health = Program.currentPlayer.MaxHealth;
+
+                    Console.WriteLine("\nYou dig your roots back into the soil... one more round with that overripe menace!");
+                    Thread.Sleep(3000);
+
+                    // Loop restarts automatically with a *fresh* Draconfruit
+                    continue;
+                }
+                else
                 {
                     Console.WriteLine("\nFarewell, brave veggie. May your journey be fruitful until we meet again.");
                     Console.WriteLine("Press any key to return to the title screen...");
@@ -236,12 +285,22 @@
                     ShowTitleScreen();
                     return;
                 }
-
-                // Reset the player's health when retrying
-                Program.currentPlayer.Health = Program.currentPlayer.MaxHealth;
+                // last debug, 28.10.2025, not 100% Bug free
             }
+            SoundPlayer sp3 = new SoundPlayer("VictoryABrightFuture.wav");
+            sp3.PlayLooping();
+
             Console.Clear();
-            Console.WriteLine("\nYou’ve won the game!");
+            Console.WriteLine("\nYou’ve won the game!\n");
+
+            Console.WriteLine($"As Draconfruit crumbles into seeds and ash, a gentle glow fills the cavern...");
+            Console.WriteLine($"{currentPlayer.WiseName} stumbles forward from the shadows — weak, but alive.");
+            Console.ResetColor();
+            Console.WriteLine("The sisters meet in silence at first, unsure if this moment is real.");
+            Console.WriteLine("Then, without a word, they embrace — laughter and tears mixing with the scent of citrus and soil.");
+            Console.WriteLine("The curse that bound them to this place fades, carried away by the warm wind of a new dawn.");
+            Console.WriteLine("");
+
             Console.WriteLine("Reunited, 'The Twinions' can finally take the long awaited vacation at Honey Beach...");
             Console.WriteLine("");
             Console.WriteLine("For the first time in many seasons, the sun rises over Layeria.");
@@ -253,14 +312,16 @@
             Console.WriteLine($"{currentPlayer.WarriorName} and {currentPlayer.WiseName} stand side by side.");
             Console.WriteLine("Not as warrior and wise one, but simply: as sisters.");
             Console.WriteLine("");
+
             Console.WriteLine("Honey Beach awaits. And this time... without weapons.");
+            Console.WriteLine("Just sunscreen, fruit smoothies, and maybe one emergency onion — just in case.");
             Console.WriteLine("\nPress any key to return to the main menu.");
 
-            SaveData.SaveGame(Program.currentPlayer, "Cave of Whispers", 99);
+            SaveData.SaveGame(Program.currentPlayer, "Cave of Whispers");
             Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine("\nYour legendary victory has been recorded in the annals of Layeria!");
+            Console.WriteLine("\nYour legendary victory has been recorded in the archives of Layeria!");
             Console.ResetColor();
-            Thread.Sleep(2000);
+            Thread.Sleep(2500);
 
             Console.WriteLine("\nPress any key to return to the main menu.");
             Console.ReadKey();
@@ -339,19 +400,24 @@
                 return;
             }
 
-            Console.Clear();
-            Console.WriteLine($"You entered: {worldName}.\n");
+            // ⚡ Restore the player's saved sublevel, or start at 1
+            int startSublevel = Program.currentPlayer.CurrentSublevel > 0
+                ? Program.currentPlayer.CurrentSublevel
+                : 1;
 
-            for (int i = 1; i <= 3; i++)
+            for (int i = startSublevel; i <= 3; i++)
             {
+                // ⚡ Track current progress for autosave
+                Program.currentPlayer.CurrentSublevel = i;
+
                 Console.Clear();
 
-                // Mini-boss buildup before level 3
+
                 if (i == 3)
                 {
                     Console.WriteLine($"You feel a shift in the air... Something big awaits at {worldName} – Sublevel {i}.");
-                    Console.WriteLine("Prepare yourself for the threat that is awaiting...");
-                    Console.WriteLine("\nPress any key to continue...");
+                    Console.WriteLine("Prepare yourself for the threat that is lying ahead...");
+                    Console.WriteLine("\nPress any key to face the threat...");
                     Console.ReadKey();
                     Console.Clear();
                 }
@@ -383,17 +449,26 @@
                 }
             }
 
-            // ✅ >>> INSERT THIS BLOCK RIGHT HERE <<<
+
             if (Program.shouldAutoSave)
             {
-                SaveData.SaveGame(Program.currentPlayer, worldName, 3);
+                SaveData.SaveGame(Program.currentPlayer, worldName);
                 Program.shouldAutoSave = false; // reset flag
                 Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine("\nProgress has been saved after defeating the miniboss!");
+                Console.WriteLine("\nProgress has been archived, now that the threat has vanished!");
                 Console.ResetColor();
                 Thread.Sleep(1500);
             }
-            // ✅ <<< END INSERTED BLOCK >>>
+
+            // Reset sublevel progress when moving on to next world
+            Program.currentPlayer.CurrentSublevel = 0;
+
+            // heals player before moving to the next world
+            Program.currentPlayer.Health = Program.currentPlayer.MaxHealth;
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("\nYou feel your energy sprout back... guess you’re not done being today’s main course.");
+            Console.ResetColor();
+            Thread.Sleep(1500);
 
             // Zur nächsten Welt übergehen
             string nextWorld = GetNextWorld(worldName);
@@ -412,7 +487,8 @@
             List<Enemy> enemies = EnemyFactory.GetEnemiesForLevel(worldName, levelNumber);
 
             Console.Clear();
-            Console.WriteLine($"{worldName} – Sublevel {levelNumber}");
+            //Console.WriteLine($"{worldName} – Sublevel {levelNumber}");
+            Console.WriteLine("You hear ominous rustling — sounds like trouble’s about to sprout!");
             Console.WriteLine($"Enemies appear: {string.Join(", ", enemies.Select(e => e.Name))}!");
 
             Console.WriteLine("\nPress any key to begin the battle...");
@@ -428,6 +504,7 @@
 
             foreach (var enemy in enemies)
             {
+                Console.Clear();
                 FightEnemy(enemy, worldName, levelNumber);
 
                 if (Program.currentPlayer.Health <= 0)
@@ -436,6 +513,12 @@
                     Console.ReadKey();
                     return;
                 }
+
+                // 🕓 Optional pause between fights
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine("\nYou take a brief moment to catch your breath...");
+                Console.ResetColor();
+                Thread.Sleep(1200);
             }
 
             // Nach Sieg jeden Bosskampfes automatisch speichern
@@ -464,6 +547,8 @@
         }
         static void FightEnemy(Enemy enemy, string worldName, int levelNumber)
         {
+            SoundPlayer sp1 = new SoundPlayer("EnemyFight.wav");
+            sp1.PlayLooping();
             Player player = Program.currentPlayer;
 
             while (enemy.Health > 0 && player.Health > 0)
@@ -513,7 +598,7 @@
                             Thread.Sleep(1000);
 
                             // Save progress before leaving
-                            SaveData.SaveGame(Program.currentPlayer, worldName, levelNumber);
+                            SaveData.SaveGame(Program.currentPlayer, worldName);
 
                             Console.WriteLine("\nYour progress has been saved.");
                             Thread.Sleep(1500);
@@ -543,7 +628,13 @@
             if (player.Health <= 0)
             {
                 Console.WriteLine("You were defeated...");
-                Console.WriteLine("Game Over");
+                Thread.Sleep(1500);
+
+                // If this is the final boss, don't handle retry here.
+                if (enemy.Name.Contains("Draconfruit"))
+                {
+                    return; // Let StartFinalBossFight() control retry logic.
+                }
 
                 // Handle death or retry logic here
                 Thread.Sleep(1200);
@@ -572,7 +663,7 @@
                     Enemy newEnemy = EnemyFactory.Create(enemy.Name);
 
                     // Restart the same fight
-                    FightEnemy(enemy, worldName, levelNumber);
+                    FightEnemy(newEnemy, worldName, levelNumber);
                 }
                 else
                 {
@@ -621,7 +712,7 @@
                     else if (worldName == "Bitterroot Forest" && !player.Weapons.Contains("Tearblade"))
                     {
                         reward = "Tearblade";
-                        description = "A blade cooled in tears of courage — said to cut through despair itself.";
+                        description = "A layered blade cooled by the tears of her enemies — said to cut through despair itself.";
                         bonusDamage = 5;
 
                         player.Weapons.Add(reward);
@@ -648,7 +739,7 @@
                         Console.WriteLine($"\nYou found: {reward}!");
                         Console.ResetColor();
                         Console.WriteLine($"\"{description}\"");
-                        Thread.Sleep(2000);
+                        Thread.Sleep(4000);
                     }
                 }
 
@@ -715,6 +806,17 @@
             Console.WriteLine("\nPress any key to return to battle...");
             Console.ReadKey();
             Console.Clear();
+        }
+        public static void ResumeGame(string worldName, int levelNumber)
+        {
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"Resuming your adventure in {worldName} (Sublevel {levelNumber})...");
+            Console.ResetColor();
+            Thread.Sleep(1500);
+
+            // Continue exactly where the player left off
+            EnterLevel(levelNumber, worldName);
         }
 
     }

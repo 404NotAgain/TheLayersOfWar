@@ -1,0 +1,18 @@
+{
+  "WarriorName": "rarri",
+  "WiseName": "rurri",
+  "World": "Bitterroot Forest",
+  "Damage": 18,
+  "MaxHealth": 37,
+  "CurrentSublevel": 3,
+  "PlayerLevel": 7,
+  "XP": 0,
+  "Health": 37,
+  "SaveDate": "2025-10-28T10:04:43.3994597+01:00",
+  "Weapons": [
+    "Rusty Dagger",
+    "Tearblade"
+  ],
+  "Inventory": [],
+  "EquippedWeapon": "Tearblade"
+}

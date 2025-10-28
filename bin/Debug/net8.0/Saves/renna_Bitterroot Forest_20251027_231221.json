@@ -1,0 +1,18 @@
+{
+  "WarriorName": "renna",
+  "WiseName": "rienna",
+  "World": "Bitterroot Forest",
+  "Damage": 18,
+  "MaxHealth": 37,
+  "CurrentSublevel": 3,
+  "PlayerLevel": 7,
+  "XP": 5,
+  "Health": 12,
+  "SaveDate": "2025-10-27T23:12:21.2540324+01:00",
+  "Weapons": [
+    "Rusty Dagger",
+    "Tearblade"
+  ],
+  "Inventory": [],
+  "EquippedWeapon": "Tearblade"
+}

@@ -27,7 +27,7 @@ namespace TheLayersOfWar
             }
             else
             {
-                Console.WriteLine($"{Name} breathes corrupted flame! You take {Damage} damage!");
+                Console.WriteLine($"{Name} breathes corrupted flames! You take {Damage} damage!");
                 player.Health -= Damage;
             }
         }
